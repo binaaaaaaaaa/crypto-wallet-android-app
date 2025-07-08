@@ -1,7 +1,9 @@
 Đồ án Ứng dụng Ví Crypto - Kotlin & Jetpack Compose
+
 Đây là một đồ án xây dựng ứng dụng ví tiền mã hóa (crypto wallet) cho hệ điều hành Android, sử dụng các công nghệ và kiến trúc hiện đại. Ứng dụng mô phỏng các chức năng cốt lõi của một ví crypto, từ việc quản lý tài sản, theo dõi giá, cho đến các tính năng giao dịch và bảo mật.
 
 ✨ Các tính năng chính
+
 Xác thực người dùng:
 
 Đăng ký và Đăng nhập bằng Email/Mật khẩu qua Firebase Authentication.
