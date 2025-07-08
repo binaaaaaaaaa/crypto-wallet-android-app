@@ -1,0 +1,17 @@
+# Các file build
+/build
+/app/build
+
+# Các file được tạo bởi IDE
+.idea/
+*.iml
+.gradle/
+local.properties
+
+# Các file hệ điều hành
+.DS_Store
+Thumbs.db
+
+# Các file nhạy cảm
+# QUAN TRỌNG: Không bao giờ đưa file này lên GitHub công khai!
+google-services.json
