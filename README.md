@@ -84,7 +84,7 @@ Biểu đồ: Vico - Thư viện vẽ biểu đồ hiện đại và linh hoạt
 🛠️ Hướng dẫn Cài đặt
 Clone repository:
 
-git clone https://github.com/YourUsername/your-repo-name.git
+git clone https://github.com/binaaaaaaaaa/crypto-wallet-android-app
 
 Thiết lập Firebase:
 
