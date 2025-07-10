@@ -2,7 +2,9 @@
 
 Đây là một đồ án xây dựng ứng dụng ví tiền mã hóa (crypto wallet) cho hệ điều hành Android, sử dụng các công nghệ và kiến trúc hiện đại. Ứng dụng mô phỏng các chức năng cốt lõi của một ví crypto, từ việc quản lý tài sản, theo dõi giá, cho đến các tính năng giao dịch và bảo mật.
 
-✨ Các tính năng chính
+---
+
+##✨ Các tính năng chính
 
 Xác thực người dùng:
 
@@ -54,7 +56,9 @@ Thay đổi quốc gia.
 
 Các tùy chọn bảo mật như xem Cụm từ khôi phục, thay đổi Mật khẩu, Email (với các hộp thoại cảnh báo an toàn).
 
-🚀 Công nghệ & Kiến trúc
+---
+
+##🚀 Công nghệ & Kiến trúc
 Ngôn ngữ: Kotlin
 
 Giao diện người dùng (UI): Jetpack Compose - Bộ công cụ hiện đại để xây dựng giao diện gốc.
@@ -81,11 +85,13 @@ Hiển thị hình ảnh: Coil - Thư viện tải và hiển thị hình ảnh 
 
 Biểu đồ: Vico - Thư viện vẽ biểu đồ hiện đại và linh hoạt cho Compose.
 
-🛠️ Hướng dẫn Cài đặt
+---
+
+##🛠️ Hướng dẫn Cài đặt
 Clone repository:
-
+```bash
 git clone https://github.com/binaaaaaaaaa/crypto-wallet-android-app.git
-
+```
 Thiết lập Firebase:
 
 Tạo một dự án mới trên Firebase Console.
