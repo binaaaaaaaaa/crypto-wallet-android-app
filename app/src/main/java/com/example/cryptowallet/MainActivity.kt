@@ -7,7 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.*
 import com.example.cryptowallet.navigation.AppNavigation
-import com.example.cryptowallet.ui.theme.CryptoWalletTheme
+import   com.example.cryptowallet.ui.theme.CryptoWalletTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -65,7 +65,6 @@ class WalletViewModel(
                     _uiState.update { it.copy(isLoading = false, error = "Không thể tải dữ liệu.") }
                 }
                 .collect { assetList ->
-                    // SỬA LỖI: Đổi tên hàm từ updateBalances thành initialize
                     BalanceManager.initialize(assetList)
 
                     val newTotalBalance = assetList.fold(BigDecimal.ZERO) { acc, asset ->

@@ -9,10 +9,6 @@ import java.math.BigDecimal
 
 enum class AccountType { FUNDING, TRADING }
 
-/**
- * Singleton để quản lý trạng thái chung của ứng dụng.
- * Lớp này giờ đây chỉ là một nơi chứa trạng thái thụ động.
- */
 object BalanceManager {
     val fundingBalances = mutableStateMapOf<String, BigDecimal>()
     val tradingBalances = mutableStateMapOf<String, BigDecimal>()
@@ -22,18 +18,21 @@ object BalanceManager {
 
     private var isInitialized = false
 
-    /**
-     * Cập nhật số dư cho các tài khoản.
-     * Hàm này sẽ được gọi bởi ViewModel sau khi có dữ liệu.
-     */
+    // SỬA LỖI: Thay đổi tham số từ WalletRepository sang List<CryptoAsset>
     fun initialize(assets: List<CryptoAsset>) {
-        if (isInitialized) return // Chỉ khởi tạo một lần
+        if (isInitialized) return
 
         assets.forEach { asset ->
             fundingBalances[asset.symbol] = asset.balance.multiply(BigDecimal("0.3"))
             tradingBalances[asset.symbol] = asset.balance.multiply(BigDecimal("0.7"))
         }
         isInitialized = true
+    }
+
+    fun reset() {
+        fundingBalances.clear()
+        tradingBalances.clear()
+        isInitialized = false
     }
 
     fun performTransfer(

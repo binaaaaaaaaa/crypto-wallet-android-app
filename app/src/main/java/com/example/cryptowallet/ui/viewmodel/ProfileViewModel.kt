@@ -41,14 +41,12 @@ class ProfileViewModel : ViewModel() {
     }
 
     private fun loadUserProfile() {
-        // Trong ứng dụng thực tế, bạn sẽ lấy thông tin này từ Firebase Auth hoặc API.
-        // Hiện tại, chúng ta sẽ dùng dữ liệu giả lập.
         _uiState.value = ProfileUiState(
             userProfile = UserProfile(
                 name = "Binaaa",
                 email = "ngu***@gmail.com",
                 uid = "557227760964673762",
-                avatarUrl = "https://i.pravatar.cc/150", // URL ảnh đại diện ngẫu nhiên
+                avatarUrl = "https://i.pravatar.cc/150", // lấy ảnh random
                 country = "Việt Nam",
                 verificationStatus = "Đã xác minh",
                 feeLevel = "Người dùng thông thường"
@@ -64,7 +62,7 @@ class ProfileViewModel : ViewModel() {
         _uiState.update { currentState ->
             currentState.copy(
                 userProfile = currentState.userProfile?.copy(country = newCountry),
-                isCountrySelectionDialogVisible = false // Ẩn hộp thoại sau khi chọn
+                isCountrySelectionDialogVisible = false
             )
         }
     }

@@ -15,9 +15,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
-/**
- * Trạng thái giao diện cho màn hình Chọn Token để Nạp.
- */
 data class SelectDepositTokenUiState(
     val isLoading: Boolean = false,
     val allTokens: List<CryptoAsset> = emptyList(),
@@ -39,7 +36,7 @@ class SelectDepositTokenViewModel(
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             try {
-                // Lấy dữ liệu của 100 token hàng đầu từ thị trường
+                // Lấy dữ liệu của 100 token từ market
                 val marketData = (walletRepository as WalletRepositoryImpl).getMarketData()
                 val tokens = marketData.map { data ->
                     CryptoAsset(
@@ -47,7 +44,6 @@ class SelectDepositTokenViewModel(
                         name = data.name,
                         symbol = data.symbol.uppercase(),
                         iconUrl = data.imageUrl,
-                        // Số dư không cần thiết ở màn hình này
                         balance = BigDecimal.ZERO,
                         priceInUsd = data.currentPrice
                     )

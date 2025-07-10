@@ -30,53 +30,38 @@ fun AppNavigation(
     onThemeToggle: () -> Unit,
     authViewModel: AuthViewModel = viewModel()
 ) {
-    val navController = rememberNavController()
     val authState by authViewModel.authState.collectAsState()
 
-    // Luôn bắt đầu từ màn hình chờ để xác định trạng thái đăng nhập
-    NavHost(navController = navController, startDestination = AppRoutes.SPLASH_SCREEN) {
-
-        composable(AppRoutes.SPLASH_SCREEN) {
-            // Màn hình chờ đơn giản
+    // Dựa vào trạng thái, quyết định hiển thị luồng nào
+    when {
+        authState.isLoading -> {
+            // Hiển thị màn hình chờ trong khi xác định trạng thái
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
         }
-
-        authGraph(
-            navController = navController,
-            authViewModel = authViewModel
-        )
-
-        mainGraph(
-            navController = navController,
-            isDarkTheme = isDarkTheme,
-            onThemeToggle = onThemeToggle,
-            onLogout = { authViewModel.logout() }
-        )
-    }
-
-    // Lắng nghe sự thay đổi trạng thái để điều hướng sau khi tải xong
-    LaunchedEffect(authState.isLoading) {
-        if (!authState.isLoading) {
-            val destination = if (authState.isAuthenticated) AppRoutes.MAIN_GRAPH else AppRoutes.AUTH_GRAPH
-            navController.navigate(destination) {
-                // Xóa màn hình chờ khỏi back stack để người dùng không thể quay lại
-                popUpTo(AppRoutes.SPLASH_SCREEN) { inclusive = true }
-            }
+        authState.isAuthenticated -> {
+            // Nếu đã đăng nhập, hiển thị nội dung chính của ứng dụng
+            AppContentNavHost(
+                isDarkTheme = isDarkTheme,
+                onThemeToggle = onThemeToggle,
+                onLogout = { authViewModel.logout() }
+            )
+        }
+        else -> {
+            // Nếu chưa đăng nhập, hiển thị luồng xác thực
+            AuthNavHost(authViewModel = authViewModel)
         }
     }
 }
 
-// Hàm mở rộng để định nghĩa đồ thị xác thực
-fun NavGraphBuilder.authGraph(
-    navController: NavHostController,
-    authViewModel: AuthViewModel
-) {
-    navigation(
-        startDestination = AppRoutes.LOGIN_SCREEN,
-        route = AppRoutes.AUTH_GRAPH
-    ) {
+/**
+ * Đồ thị điều hướng cho luồng Xác thực (Đăng nhập, Đăng ký).
+ */
+@Composable
+fun AuthNavHost(authViewModel: AuthViewModel) {
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = AppRoutes.LOGIN_SCREEN) {
         composable(AppRoutes.LOGIN_SCREEN) {
             LoginScreen(navController = navController, authViewModel = authViewModel)
         }
@@ -86,17 +71,17 @@ fun NavGraphBuilder.authGraph(
     }
 }
 
-// Hàm mở rộng để định nghĩa đồ thị nội dung chính
-fun NavGraphBuilder.mainGraph(
-    navController: NavHostController,
+/**
+ * Đồ thị điều hướng cho luồng Nội dung chính của ứng dụng.
+ */
+@Composable
+fun AppContentNavHost(
     isDarkTheme: Boolean,
     onThemeToggle: () -> Unit,
     onLogout: () -> Unit
 ) {
-    navigation(
-        startDestination = AppRoutes.MAIN_SCREEN,
-        route = AppRoutes.MAIN_GRAPH
-    ) {
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = AppRoutes.MAIN_SCREEN) {
         composable(AppRoutes.MAIN_SCREEN) {
             MainScreen(
                 mainNavController = navController,
@@ -105,7 +90,7 @@ fun NavGraphBuilder.mainGraph(
                 onLogout = onLogout
             )
         }
-        // Định nghĩa tất cả các màn hình có thể truy cập sau khi đăng nhập
+        // Định nghĩa tất cả các màn hình khác có thể truy cập sau khi đăng nhập
         composable(AppRoutes.TRANSACTIONS_SCREEN) { TransactionHistoryScreen(navController) }
         composable(AppRoutes.SEND_SCREEN) { SendScreen(navController) }
         composable(AppRoutes.P2P_SCREEN) { P2PScreen(navController) }

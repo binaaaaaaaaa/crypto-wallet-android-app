@@ -8,7 +8,6 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 import java.math.BigDecimal
 
-// CẬP NHẬT: Thêm các trường mới
 data class CoinMarketData(
     @SerializedName("id") val id: String,
     @SerializedName("symbol") val symbol: String,
@@ -44,7 +43,6 @@ data class MarketChartData(
 
 interface CryptoApiService {
 
-    // CẬP NHẬT: Thêm tham số `sparkline=true`
     @GET("api/v3/coins/markets")
     suspend fun getCoinMarkets(
         @Query("vs_currency") vsCurrency: String = "usd",

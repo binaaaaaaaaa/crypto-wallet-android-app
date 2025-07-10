@@ -6,6 +6,8 @@ import com.example.cryptowallet.model.CryptoAsset
 import com.example.cryptowallet.model.Transaction
 import com.example.cryptowallet.model.TransactionType
 import com.example.cryptowallet.ui.viewmodel.AssetDetail
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -14,44 +16,73 @@ import kotlinx.coroutines.flow.flowOn
 import java.math.BigDecimal
 import java.util.*
 
+/**
+ * Interface định nghĩa các nguồn dữ liệu cho ứng dụng.
+ */
 interface WalletRepository {
     fun getAssets(): Flow<List<CryptoAsset>>
     fun getTransactions(): Flow<List<Transaction>>
     fun getAssetDetails(assetId: String): Flow<AssetDetail>
     fun getAssetChartData(assetId: String, days: String): Flow<List<Pair<Long, Float>>>
-    // CẬP NHẬT: Thêm hàm mới
     suspend fun getMarketData(): List<CoinMarketData>
 }
 
+/**
+ * Lớp triển khai của WalletRepository, chịu trách nhiệm lấy dữ liệu thực tế từ API.
+ */
 class WalletRepositoryImpl(
     private val apiService: CryptoApiService
 ) : WalletRepository {
 
-    private val userBalances = mapOf(
-        "bitcoin" to BigDecimal("0.512"),
-        "ethereum" to BigDecimal("10.2"),
-        "solana" to BigDecimal("125.7"),
-        "dogecoin" to BigDecimal("2500.0"),
-        "tether" to BigDecimal("1500.48"),
-        "xrp" to BigDecimal("1050.0")
+    // Dữ liệu giả lập cho tài khoản demo
+    private val demoUserBalances = mapOf(
+        "bitcoin" to BigDecimal("0.5"),      // ~$35,000
+        "ethereum" to BigDecimal("10"),       // ~$35,000
+        "tether" to BigDecimal("10000"),    // $10,000
+        "solana" to BigDecimal("100"),      // ~$15,000
+        "xrp" to BigDecimal("10000")        // ~$5,000
     )
 
+    private var assetsCache: List<CryptoAsset>? = null
+
     override fun getAssets(): Flow<List<CryptoAsset>> = flow {
-        val marketData = apiService.getCoinMarkets(vsCurrency = "usd", sparkline = false) // Không cần sparkline ở đây
-        val assets = marketData
-            .filter { marketInfo: CoinMarketData -> userBalances.containsKey(marketInfo.id) }
-            .map { marketInfo: CoinMarketData ->
+        // Gửi dữ liệu từ cache đi ngay lập tức (nếu có)
+        assetsCache?.let { emit(it) }
+
+        val currentUser = Firebase.auth.currentUser
+
+        // Xác định xem nên sử dụng số dư nào
+        val balancesToShow = if (currentUser?.email == "khangtran@gmail.com") {
+            demoUserBalances
+        } else {
+            emptyMap() // Tài khoản mới hoặc khác sẽ không có tài sản
+        }
+
+        if (balancesToShow.isEmpty()) {
+            emit(emptyList())
+            return@flow
+        }
+
+        val marketData = apiService.getCoinMarkets(vsCurrency = "usd", sparkline = false)
+
+        val freshAssets = marketData
+            .filter { marketInfo -> balancesToShow.containsKey(marketInfo.id) }
+            .map { marketInfo ->
                 CryptoAsset(
                     id = marketInfo.id,
                     name = marketInfo.name,
                     symbol = marketInfo.symbol.uppercase(),
                     iconUrl = marketInfo.imageUrl,
                     priceInUsd = marketInfo.currentPrice,
-                    balance = userBalances[marketInfo.id] ?: BigDecimal.ZERO
+                    balance = balancesToShow[marketInfo.id] ?: BigDecimal.ZERO
                 )
             }
-        emit(assets)
-    }.flowOn(Dispatchers.IO)
+
+        assetsCache = freshAssets
+        emit(freshAssets)
+    }
+        .flowOn(Dispatchers.IO)
+
 
     override fun getTransactions(): Flow<List<Transaction>> = flow {
         delay(500)
@@ -71,7 +102,7 @@ class WalletRepositoryImpl(
             iconUrl = detailData.image.large,
             currentPrice = detailData.marketData.currentPrice["usd"] ?: BigDecimal.ZERO,
             priceChange24h = detailData.marketData.priceChange24h["usd"] ?: 0.0,
-            balance = userBalances[assetId] ?: BigDecimal.ZERO
+            balance = demoUserBalances[assetId] ?: BigDecimal.ZERO // Tạm thời dùng demo balance
         )
         emit(assetDetail)
     }.flowOn(Dispatchers.IO)
@@ -84,7 +115,6 @@ class WalletRepositoryImpl(
         emit(pricePoints)
     }.flowOn(Dispatchers.IO)
 
-    // CẬP NHẬT: Implement hàm mới
     override suspend fun getMarketData(): List<CoinMarketData> {
         return apiService.getCoinMarkets(perPage = 100, sparkline = true)
     }

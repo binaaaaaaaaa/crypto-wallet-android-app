@@ -43,7 +43,6 @@ fun ProfileScreen(
     var selectedTabIndex by remember { mutableStateOf(0) }
     val tabs = listOf("Hồ sơ", "Bảo mật")
 
-    // Hiển thị hộp thoại chọn quốc gia khi cần
     if (uiState.isCountrySelectionDialogVisible) {
         CountrySelectionDialog(
             onCountrySelected = { viewModel.onCountrySelected(it) },
@@ -51,7 +50,6 @@ fun ProfileScreen(
         )
     }
 
-    // Hiển thị hộp thoại cảnh báo bảo mật khi cần
     if (uiState.isPasswordWarningDialogVisible) {
         SecurityWarningDialog(
             title = "Thông báo bảo mật",
@@ -59,12 +57,10 @@ fun ProfileScreen(
             onDismiss = { viewModel.hidePasswordWarningDialog() },
             onConfirm = {
                 viewModel.hidePasswordWarningDialog()
-                // TODO: Điều hướng đến màn hình thay đổi mật khẩu
             }
         )
     }
 
-    // Hiển thị hộp thoại cảnh báo Seed Phrase khi cần
     if (uiState.isSeedPhraseWarningDialogVisible) {
         SecurityWarningDialog(
             title = "Cảnh báo bảo mật",
@@ -81,7 +77,6 @@ fun ProfileScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Trung tâm người dùng") }
-                // Không cần nút quay lại ở màn hình cấp cao nhất trong Bottom Nav
             )
         }
     ) { padding ->

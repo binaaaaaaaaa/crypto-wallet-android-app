@@ -35,7 +35,6 @@ fun SelectTokenScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    // Lọc danh sách token dựa trên từ khóa tìm kiếm
     val filteredTokens = remember(uiState.allTokens, uiState.searchQuery) {
         if (uiState.searchQuery.isBlank()) {
             uiState.allTokens

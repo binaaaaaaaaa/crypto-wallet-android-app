@@ -1,7 +1,5 @@
 package com.example.cryptowallet.ui.screen.main
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -9,7 +7,6 @@ import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -38,23 +35,25 @@ fun MainScreen(
     mainNavController: NavHostController,
     isDarkTheme: Boolean,
     onThemeToggle: () -> Unit,
-    onLogout: () -> Unit // Thêm tham số onLogout
+    onLogout: () -> Unit
 ) {
     val bottomNavController = rememberNavController()
     Scaffold(
         bottomBar = { BottomBar(navController = bottomNavController) }
     ) { innerPadding ->
+        // NavHost cho các màn hình con của thanh điều hướng
         BottomNavGraph(
             mainNavController = mainNavController,
             bottomNavController = bottomNavController,
             modifier = Modifier.padding(innerPadding),
             isDarkTheme = isDarkTheme,
             onThemeToggle = onThemeToggle,
-            onLogout = onLogout // Truyền xuống
+            onLogout = onLogout
         )
     }
 }
 
+// Đồ thị điều hướng cho các mục ở dưới cùng
 @Composable
 fun BottomNavGraph(
     mainNavController: NavHostController,
@@ -62,7 +61,7 @@ fun BottomNavGraph(
     modifier: Modifier = Modifier,
     isDarkTheme: Boolean,
     onThemeToggle: () -> Unit,
-    onLogout: () -> Unit // Thêm tham số onLogout
+    onLogout: () -> Unit
 ) {
     NavHost(
         navController = bottomNavController,
@@ -70,6 +69,7 @@ fun BottomNavGraph(
         modifier = modifier
     ) {
         composable("wallet_section") {
+            // Màn hình Tài sản (Wallet)
             WalletRoute(
                 navController = mainNavController,
                 isDarkTheme = isDarkTheme,
@@ -77,13 +77,15 @@ fun BottomNavGraph(
             )
         }
         composable("market_section") {
+            // Màn hình Thị trường
             MarketScreen(navController = mainNavController)
         }
         composable("trade_section") {
+            // Màn hình Giao dịch P2P
             P2PScreen(navController = mainNavController)
         }
         composable("profile_section") {
-            // Truyền onLogout vào ProfileScreen
+            // Màn hình Hồ sơ
             ProfileScreen(navController = mainNavController, onLogout = onLogout)
         }
     }

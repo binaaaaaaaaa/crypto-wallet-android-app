@@ -5,10 +5,8 @@ object AppRoutes {
     const val AUTH_GRAPH = "auth_graph"
     const val LOGIN_SCREEN = "login_screen"
     const val REGISTER_SCREEN = "register_screen"
-
     const val MAIN_GRAPH = "main_graph"
     const val MAIN_SCREEN = "main_screen"
-
     const val TRANSACTIONS_SCREEN = "transactions_screen"
     const val SEND_SCREEN = "send_screen"
     const val SELECT_TOKEN_SCREEN = "select_token_screen"

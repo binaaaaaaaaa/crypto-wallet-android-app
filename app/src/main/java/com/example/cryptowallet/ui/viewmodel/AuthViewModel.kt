@@ -14,9 +14,22 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
+/**
+ * Lớp trạng thái (State) cho giao diện Xác thực.
+ * @param isAuthenticated Cờ cho biết người dùng đã đăng nhập hay chưa.
+ * @param isLoading Cờ cho biết một tác vụ (đăng nhập/đăng ký) có đang được xử lý hay không.
+ * @param username Tên người dùng nhập vào khi đăng ký.
+ * @param email Email người dùng nhập vào.
+ * @param password Mật khẩu người dùng nhập vào.
+ * @param isPasswordVisible Cờ để điều khiển việc hiển thị mật khẩu.
+ * @param emailError Lỗi định dạng email (nếu có).
+ * @param authError Lỗi chung cho đăng nhập/đăng ký (ví dụ: sai mật khẩu, tài khoản tồn tại).
+ * @param registrationSuccess Cờ để báo hiệu đăng ký thành công (sự kiện một lần).
+ * @param lastLoggedInEmail Lưu lại email của lần đăng nhập thành công cuối cùng.
+ */
 data class AuthState(
     val isAuthenticated: Boolean = false,
-    val isLoading: Boolean = true, // Bắt đầu ở trạng thái đang tải
+    val isLoading: Boolean = false,
     val username: String = "",
     val email: String = "",
     val password: String = "",
@@ -35,15 +48,10 @@ class AuthViewModel : ViewModel() {
     init {
         // Lắng nghe sự thay đổi trạng thái đăng nhập từ Firebase
         auth.addAuthStateListener { firebaseAuth ->
-            // Khi listener nhận được trạng thái, việc tải ban đầu đã hoàn tất
-            _authState.update { it.copy(
-                isAuthenticated = firebaseAuth.currentUser != null,
-                isLoading = false
-            )}
+            _authState.update { it.copy(isAuthenticated = firebaseAuth.currentUser != null) }
         }
     }
 
-    // ... các hàm khác giữ nguyên ...
     fun onUsernameChange(username: String) {
         _authState.update { it.copy(username = username, authError = null) }
     }
@@ -77,6 +85,7 @@ class AuthViewModel : ViewModel() {
             _authState.update { it.copy(isLoading = true) }
             try {
                 auth.signInWithEmailAndPassword(state.email, state.password).await()
+                // Cập nhật email đã đăng nhập lần cuối sau khi thành công
                 _authState.update { it.copy(lastLoggedInEmail = it.email, password = "", username = "") }
             } catch (e: Exception) {
                 _authState.update { it.copy(authError = "Đăng nhập thất bại: ${e.message}") }
@@ -106,7 +115,9 @@ class AuthViewModel : ViewModel() {
         viewModelScope.launch {
             _authState.update { it.copy(isLoading = true) }
             try {
+                // Trong một ứng dụng thực tế, bạn sẽ lưu cả username vào Firestore ở đây
                 auth.createUserWithEmailAndPassword(state.email, state.password).await()
+                // Đăng xuất ngay sau khi đăng ký để người dùng phải đăng nhập lại
                 auth.signOut()
                 _authState.update { it.copy(registrationSuccess = true) }
             } catch (e: Exception) {
